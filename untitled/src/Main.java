@@ -7,6 +7,7 @@ public class Main {
         Scanner in = new Scanner(System.in);
         System.out.print("Input a number: ");
         String consoleString = in.nextLine();
+        //String consoleString = "4/2"; //uncomment if you are debugging
         String[] checkString = CheckMethod(consoleString);
         int result = DoOperation(checkString);
         if (!checkString[0].matches("^[0-9]"))
@@ -29,8 +30,12 @@ public class Main {
     private static int DoOperation(String[] input) throws Exception{
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
-        return (int)Math.floor((Double)engine.eval(ConvertToArabic(input[0]) + input[1] + ConvertToArabic(input[2])));
-    }
+        Object result = engine.eval(ConvertToArabic(input[0]) + input[1]+ ConvertToArabic(input[2]));
+        if (result.toString().matches("^[0-9]"))
+            return (int)result;
+        else
+            return (int)Math.floor((double)result);
+        }
     private static int ConvertToArabic(String input){
         if(input.matches("^[0-9]"))
             return Integer.parseInt(input);
