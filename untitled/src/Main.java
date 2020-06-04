@@ -33,8 +33,6 @@ public class Main {
     private static int DoOperation(String[] input) throws Exception{
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
-        var a = ConvertToArabic(input[0]);
-        var b = ConvertToArabic(input[2]);
         Object result = engine.eval(ConvertToArabic(input[0]) + input[1]+ ConvertToArabic(input[2]));
         if (result.toString().matches("^[0-9]{1,2}"))
             return (int)result;
