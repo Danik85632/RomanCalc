@@ -1,11 +1,14 @@
 import javax.script.*;
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
     public static void main(String[] args) throws Exception{
         Scanner in = new Scanner(System.in);
-        System.out.print("Input a number: ");
+        System.out.print("Input a arithmetic expression: ");
         String consoleString = in.nextLine();
         //String consoleString = "4/2"; //uncomment if you are debugging
         String[] checkString = CheckMethod(consoleString);
@@ -16,6 +19,9 @@ public class Main {
             System.out.println(result);
     }
     private static String[] CheckMethod(String input) throws Exception{
+        if(input.length()<2){
+            throw new Exception("The input string is not in the correct format. Please use the format 1+1 or I*I");
+        }
         String[] result = input.split("(?<=[-+*/])|(?=[-+*/])");
         if (result.length != 3){
             throw new Exception("The input string is not in the correct format. Please use the format 1+1 or I*I");
@@ -30,22 +36,30 @@ public class Main {
     private static int DoOperation(String[] input) throws Exception{
         ScriptEngineManager mgr = new ScriptEngineManager();
         ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        var a = ConvertToArabic(input[0]);
+        var b = ConvertToArabic(input[2]);
         Object result = engine.eval(ConvertToArabic(input[0]) + input[1]+ ConvertToArabic(input[2]));
-        if (result.toString().matches("^[0-9]"))
+        if (result.toString().matches("^[0-9]{1,2}"))
             return (int)result;
         else
             return (int)Math.floor((double)result);
-        }
+    }
     private static int ConvertToArabic(String input){
         if(input.matches("^[0-9]"))
             return Integer.parseInt(input);
         int arabicValue = 0;
         while(input.length()!=0){
             String finalInput = input;
-            var a = ((ArabicRoman)Arrays.stream((ArabicRoman.values())).filter(x->
+            var isEqual = (Arrays.stream((ArabicRoman.values())).filter(x->
+                    x.name().length()>1 && finalInput.equals(x.name())).findAny());
+            if ((isEqual).isPresent()){
+                return ((ArabicRoman)(Arrays.stream((ArabicRoman.values())).filter(x->
+                        x.name().length()>1 && finalInput.equals(x.name())).toArray()[0])).value;
+            }
+            ArabicRoman temp = ((ArabicRoman)Arrays.stream((ArabicRoman.values())).filter(x->
                     finalInput.contains(x.name())).toArray()[0]);
-            input = input.replaceFirst(a.name(),"");
-            arabicValue+=a.value;
+            input = input.replaceFirst(temp.name(),"");
+            arabicValue+=temp.value;
         }
         return arabicValue;
     }
